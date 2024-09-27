@@ -1,6 +1,7 @@
 // src/MarkdownEditor.js
 import React, { useState, useRef } from 'react';
 import { EditorView, basicSetup } from 'codemirror';
+import {gutter, GutterMarker} from "@codemirror/view"
 import { markdown } from '@codemirror/lang-markdown';
 import { useCodeMirror } from '@uiw/react-codemirror';
 import { marked } from 'marked';
@@ -57,9 +58,11 @@ const MarkdownEditor = () => {
   const { setContainer, view } = useCodeMirror({
     container: editorRef.current,
     value: markdownContent,
-    extensions: [basicSetup, markdown()],
-    onChange: (value) => {
-      setMarkdownContent(value);
+    basicSetup: {
+      lineNumbers: false,
+      highlightActiveLine: false, // Disable active line highlighting
+      highlightActiveLineGutter: false, // Disable gutter highlighting for active line
+      lineWrapping: true,
     },
   });
 

@@ -73,7 +73,18 @@ export const MarkdownInput = styled.div`
   border-right: 1px solid #ddd;
   padding: 10px;
   box-sizing: border-box;
-  overflow-y: auto;
+  overflow-y: auto;  .cm-editor,
+
+  .cm-editor * {
+    border: none;
+    outline: none;
+  }
+
+  /* Ensure line wrapping is properly styled */
+  .cm-content {
+    white-space: pre-wrap ;
+    word-wrap: break-word;
+  }
 `;
 
 export const Preview = styled.div`
@@ -92,4 +103,8 @@ export const Preview = styled.div`
   code {
     color: #c5c8c6;
   }
-`;
+`
+
+
+
+;
