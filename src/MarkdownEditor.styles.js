@@ -1,110 +1,104 @@
-// src/MarkdownEditor.styles.js
 import styled from 'styled-components';
 
-export const PostContainer = styled.div`
+export const MarkdownEditorContainer = styled.div`
+  display: flex;
+  gap: 20px;
+  width: 100%;
+  height: 100vh;
+  box-sizing: border-box;
+`;
+
+export const LeftContainer = styled.div`
+  width: 50%; /* 화면의 절반 너비로 고정 */
   display: flex;
   flex-direction: column;
   padding: 20px;
-  gap: 20px;
-`;
-
-export const SplitContainer = styled.div`
-  display: flex;
-  gap: 20px;
-  height: 80vh;
-`;
-
-export const EditorSection = styled.div`
-  display: flex;
-  flex-direction: column;
-  width: 50%;
-`;
-
-export const PreviewSection = styled.div`
-  display: flex;
-  flex-direction: column;
-  width: 50%;
-  padding: 10px;
-  border-left: 1px solid #ddd;
-  box-sizing: border-box;
 `;
 
 export const TitleInput = styled.input`
-  padding: 10px;
-  font-size: 18px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  outline: none;
-  margin-bottom: 10px;
-`;
-
-export const PreviewTitle = styled.h1`
+  width: 100%;
   font-size: 24px;
-  margin-bottom: 20px;
+  font-weight: bold;
+  border: 1px solid #ffffff;
+  outline: none;
+  margin: 20px 0;
 `;
 
 export const EditorContainer = styled.div`
-  display: flex;
-  flex-direction: column;
+  flex: 1;
+  border: 1px solid #ffffff;
+  font-family: 'Courier New', monospace;
+  font-size: 16px;
+  overflow-y: auto; /* 세로 스크롤 */
+  white-space: pre-wrap; /* 자동 줄바꿈 설정 */
+  word-wrap: break-word; /* 단어가 길 경우 줄바꿈 */
   height: 100%;
 `;
 
-export const Toolbar = styled.div`
-  display: flex;
-  padding: 10px;
-  border-bottom: 1px solid #ddd;
-  background: #f4f4f4;
-`;
-
-export const Button = styled.button`
-  margin-right: 5px;
-  padding: 5px 10px;
-  font-size: 14px;
-  cursor: pointer;
-  border: 1px solid #ddd;
-  background: #fff;
-  &:hover {
-    background: #eaeaea;
-  }
-`;
-
-export const MarkdownInput = styled.div`
+export const PreviewContainer = styled.div`
+  width: 50%; /* 화면의 절반 너비로 고정 */
+  padding: 20px;
+  border: 1px solid #ffffff;
+  background-color: #F5FBFF;
+  font-family: 'Arial', sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  overflow-y: auto;
   height: 100%;
-  border-right: 1px solid #ddd;
-  padding: 10px;
-  box-sizing: border-box;
-  overflow-y: auto;  .cm-editor,
-
-  .cm-editor * {
-    border: none;
-    outline: none;
+  color: #333;
+  
+  h1 {
+    font-size: 2em;
+    margin-top: 0;
+    color: #333;
   }
-
-  /* Ensure line wrapping is properly styled */
-  .cm-content {
-    white-space: pre-wrap ;
-    word-wrap: break-word;
+  
+  h2 {
+    font-size: 1.75em;
+    margin-top: 1em;
+    color: #333;
   }
-`;
-
-export const Preview = styled.div`
-  height: 100%;
-  padding: 10px;
-  overflow-y: scroll;
-  box-sizing: border-box;
-
-  pre {
-    background-color: #1e1e1e; /* 검정색 배경 */
-    padding: 10px;
-    border-radius: 5px;
-    overflow-x: auto;
+  
+  p {
+    margin: 1em 0;
   }
-
+  
   code {
-    color: #c5c8c6;
+    background-color: #f5f5f5;
+    padding: 0.2em 0.4em;
+    border-radius: 4px;
+    font-size: 90%;
   }
-`
-
-
-
-;
+  
+  pre code {
+    display: block;
+    padding: 1em;
+    background-color: #2d2d2d;
+    color: #f8f8f2;
+    overflow-x: auto;
+    border-radius: 8px;
+    font-size: 0.95em;
+  }
+  
+  a {
+    color: #1e90ff;
+    text-decoration: none;
+  }
+  
+  a:hover {
+    text-decoration: underline;
+  }
+  
+  ul, ol {
+    margin: 1em 0;
+    padding-left: 2em;
+  }
+  
+  blockquote {
+    border-left: 4px solid #ddd;
+    padding-left: 16px;
+    color: #666;
+    font-style: italic;
+    margin: 1em 0;
+  }
+`;
