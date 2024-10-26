@@ -26,6 +26,30 @@ export const TitleInput = styled.textarea`
   overflow: hidden;
 `;
 
+export const Toolbar = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+  
+  button {
+    background: none;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+    padding: 5px;
+    color: #666;
+
+    &:hover {
+      color: #333;
+    }
+  }
+
+  span {
+    color: #ccc;
+  }
+`;
+
 export const EditorContainer = styled.div`
   flex: 1;
   border: 1px solid #ffffff;
