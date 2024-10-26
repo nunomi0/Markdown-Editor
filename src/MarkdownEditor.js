@@ -11,6 +11,9 @@ function MarkdownEditor() {
   const [editorView, setEditorView] = useState(null);
   const [markdownContent, setMarkdownContent] = useState('');
   const [title, setTitle] = useState('');
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [linkURL, setLinkURL] = useState('');
+  const [isImageUploadOpen, setIsImageUploadOpen] = useState(false);
 
   useEffect(() => {
     if (!editorRef.current) return;
@@ -64,7 +67,7 @@ function MarkdownEditor() {
     const regex = styles[style];
     const wrap = wraps[style];
 
-    return regex.test(text) ? text.replace(regex, '$1') : `${wrap}${text}${wrap}`;
+    return regex.test(text) ? text.replace(regex, '$1') : `${wrap}${text || '텍스트'}${wrap}`;
   };
 
   const toggleBlockStyle = (text, style) => {
@@ -81,11 +84,10 @@ function MarkdownEditor() {
     const regex = styles[style];
     const wrap = wraps[style];
 
-    // Block style에 따라 적용 또는 제거
     if (style === 'code') {
-      return regex.test(text) ? text.replace(regex, '$1') : `${wrap[0]}${text}${wrap[1]}`;
+      return regex.test(text) ? text.replace(regex, '$1') : `${wrap[0]}${text || '텍스트'}${wrap[1]}`;
     }
-    return regex.test(text) ? text.replace(regex, '$1') : `${wrap}${text}`;
+    return regex.test(text) ? text.replace(regex, '$1') : `${wrap}${text || '텍스트'}`;
   };
 
   const setHeadingLevel = (currentLineText, level) => {
@@ -97,9 +99,17 @@ function MarkdownEditor() {
   const applyMarkdownSyntax = (syntax) => {
     if (!editorView) return;
 
+    if (syntax === 'link') {
+      setIsModalOpen(true);
+      return;
+    } else if (syntax === 'image') {
+      setIsImageUploadOpen(true);
+      return;
+    }
+
     editorView.dispatch(
       editorView.state.changeByRange((range) => {
-        const line = editorView.state.doc.lineAt(range.from); 
+        const line = editorView.state.doc.lineAt(range.from);
         const currentLineText = line.text;
         const selectedText = editorView.state.sliceDoc(range.from, range.to);
 
@@ -131,6 +141,43 @@ function MarkdownEditor() {
     );
   };
 
+  const handleLinkInsert = () => {
+    if (!editorView) return;
+    
+    const linkText = "링크 텍스트";
+    const markdownLink = `[${linkText}](${linkURL})`;
+    editorView.dispatch(
+      editorView.state.changeByRange((range) => ({
+        changes: { from: range.from, to: range.to, insert: markdownLink },
+        range: EditorSelection.cursor(range.from + markdownLink.length),
+      }))
+    );
+
+    setIsModalOpen(false);
+    setLinkURL('');
+  };
+
+  const handleImageUpload = (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const imageURL = reader.result;
+      const markdownImage = `![이미지 설명](${imageURL})`;
+
+      editorView.dispatch(
+        editorView.state.changeByRange((range) => ({
+          changes: { from: range.from, to: range.to, insert: markdownImage },
+          range: EditorSelection.cursor(range.from + markdownImage.length),
+        }))
+      );
+    };
+    reader.readAsDataURL(file);
+
+    setIsImageUploadOpen(false);
+  };
+
   return (
     <Styled.MarkdownEditorContainer>
       <Styled.LeftContainer>
@@ -156,6 +203,36 @@ function MarkdownEditor() {
         <Styled.EditorContainer ref={editorRef} />
       </Styled.LeftContainer>
       <Styled.PreviewContainer dangerouslySetInnerHTML={renderPreview()} />
+      
+      {isModalOpen && (
+        <Styled.ModalOverlay>
+          <Styled.ModalContent>
+            <h3>링크 추가</h3>
+            <input
+              type="text"
+              placeholder="URL을 입력하세요"
+              value={linkURL}
+              onChange={(e) => setLinkURL(e.target.value)}
+            />
+            <button onClick={handleLinkInsert}>확인</button>
+            <button onClick={() => setIsModalOpen(false)}>취소</button>
+          </Styled.ModalContent>
+        </Styled.ModalOverlay>
+      )}
+
+      {isImageUploadOpen && (
+        <Styled.ModalOverlay>
+          <Styled.ModalContent>
+            <h3>이미지 업로드</h3>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleImageUpload}
+            />
+            <button onClick={() => setIsImageUploadOpen(false)}>취소</button>
+          </Styled.ModalContent>
+        </Styled.ModalOverlay>
+      )}
     </Styled.MarkdownEditorContainer>
   );
 }
