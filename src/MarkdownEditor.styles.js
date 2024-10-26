@@ -9,30 +9,30 @@ export const MarkdownEditorContainer = styled.div`
 `;
 
 export const LeftContainer = styled.div`
-  width: 50%; /* 화면의 절반 너비로 고정 */
+  width: 50%;
   display: flex;
   flex-direction: column;
   padding: 20px;
 `;
 
-export const TitleInput = styled.input`
+export const TitleInput = styled.textarea`
   width: 100%;
   font-size: 24px;
   font-weight: bold;
   border: 1px solid #ffffff;
   outline: none;
   margin: 20px 0;
+  resize: none;
+  overflow: hidden;
 `;
 
 export const EditorContainer = styled.div`
   flex: 1;
   border: 1px solid #ffffff;
-  font-family: 'Courier New', monospace;
   font-size: 16px;
   overflow-y: auto; /* 세로 스크롤 */
   white-space: pre-wrap; /* 자동 줄바꿈 설정 */
   word-wrap: break-word; /* 단어가 길 경우 줄바꿈 */
-  height: 100%;
 `;
 
 export const PreviewContainer = styled.div`
