@@ -48,42 +48,50 @@ function MarkdownEditor() {
     return { __html: marked(`# ${previewTitle}\n${markdownContent}`) };
   };
 
-  const toggleMarkdownSyntax = (text, syntax) => {
-    const syntaxPairs = {
-      heading1: /^# (.*)$/,
-      heading2: /^## (.*)$/,
-      heading3: /^### (.*)$/,
+  const toggleInlineStyle = (text, style) => {
+    const styles = {
       bold: /^\*\*(.*)\*\*$/,
       italic: /^\*(.*)\*$/,
       strikethrough: /^~~(.*)~~$/,
-      blockquote: /^> (.*)$/,
-      link: /^\[(.*)\]\(.*\)$/,
-      image: /^!\[(.*)\]\(.*\)$/,
-      code: /^```([\s\S]*?)```$/,
     };
-    const syntaxWraps = {
-      heading1: '# ',
-      heading2: '## ',
-      heading3: '### ',
+
+    const wraps = {
       bold: '**',
       italic: '*',
       strikethrough: '~~',
+    };
+
+    const regex = styles[style];
+    const wrap = wraps[style];
+
+    return regex.test(text) ? text.replace(regex, '$1') : `${wrap}${text}${wrap}`;
+  };
+
+  const toggleBlockStyle = (text, style) => {
+    const styles = {
+      blockquote: /^> (.*)$/,
+      code: /^```([\s\S]*?)```$/,
+    };
+
+    const wraps = {
       blockquote: '> ',
-      link: ['[', '](url)'],
-      image: ['![', '](image-url)'],
       code: ['```\n', '\n```'],
     };
 
-    const regex = syntaxPairs[syntax];
-    if (regex && regex.test(text)) {
-      return text.replace(regex, '$1');
-    }
+    const regex = styles[style];
+    const wrap = wraps[style];
 
-    const wrap = syntaxWraps[syntax];
-    if (Array.isArray(wrap)) {
-      return `${wrap[0]}${text}${wrap[1]}`;
+    // Block style에 따라 적용 또는 제거
+    if (style === 'code') {
+      return regex.test(text) ? text.replace(regex, '$1') : `${wrap[0]}${text}${wrap[1]}`;
     }
-    return `${wrap}${text}${wrap}`;
+    return regex.test(text) ? text.replace(regex, '$1') : `${wrap}${text}`;
+  };
+
+  const setHeadingLevel = (currentLineText, level) => {
+    const headingLevels = ['# ', '## ', '### '];
+    const strippedText = currentLineText.replace(/^#+\s*/, '');
+    return headingLevels[level - 1] + strippedText;
   };
 
   const applyMarkdownSyntax = (syntax) => {
@@ -91,16 +99,34 @@ function MarkdownEditor() {
 
     editorView.dispatch(
       editorView.state.changeByRange((range) => {
+        const line = editorView.state.doc.lineAt(range.from); 
+        const currentLineText = line.text;
         const selectedText = editorView.state.sliceDoc(range.from, range.to);
-        const newText = toggleMarkdownSyntax(selectedText, syntax);
-        
-        // 설정한 텍스트 길이에 맞추어 선택 영역을 유지합니다.
-        const newSelection = EditorSelection.range(range.from, range.from + newText.length);
 
-        return {
-          changes: { from: range.from, to: range.to, insert: newText },
-          range: newSelection,
-        };
+        let newText;
+
+        if (syntax.startsWith('heading')) {
+          const level = parseInt(syntax.slice(-1));
+          newText = setHeadingLevel(currentLineText, level);
+          return {
+            changes: { from: line.from, to: line.to, insert: newText },
+            range: EditorSelection.cursor(line.from + newText.length),
+          };
+        } else if (syntax === 'blockquote' || syntax === 'code') {
+          newText = toggleBlockStyle(selectedText || currentLineText, syntax);
+          const from = selectedText ? range.from : line.from;
+          const to = selectedText ? range.to : line.to;
+          return {
+            changes: { from, to, insert: newText },
+            range: EditorSelection.cursor(from + newText.length),
+          };
+        } else {
+          newText = toggleInlineStyle(selectedText, syntax);
+          return {
+            changes: { from: range.from, to: range.to, insert: newText },
+            range: EditorSelection.range(range.from, range.from + newText.length),
+          };
+        }
       })
     );
   };
