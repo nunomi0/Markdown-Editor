@@ -57,6 +57,9 @@ export const EditorContainer = styled.div`
   overflow-y: auto; /* 세로 스크롤 */
   white-space: pre-wrap; /* 자동 줄바꿈 설정 */
   word-wrap: break-word; /* 단어가 길 경우 줄바꿈 */
+  .cm-editor.cm-focused {
+    outline: none;
+  }
 `;
 
 export const PreviewContainer = styled.div`
