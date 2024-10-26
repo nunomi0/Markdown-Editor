@@ -30,8 +30,7 @@ export const Toolbar = styled.div`
   display: flex;
   align-items: center;
   gap: 10px;
-  margin-bottom: 10px;
-  
+  margin-bottom: 20px;
   button {
     background: none;
     border: none;

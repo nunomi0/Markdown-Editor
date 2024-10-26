@@ -1,9 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { EditorState } from '@codemirror/state';
+import { EditorState, EditorSelection } from '@codemirror/state';
 import { EditorView, keymap, placeholder } from '@codemirror/view';
 import { markdown } from '@codemirror/lang-markdown';
 import { defaultKeymap } from '@codemirror/commands';
-import { EditorSelection } from '@codemirror/state';
 import { marked } from 'marked';
 import * as Styled from './MarkdownEditor.styles';
 
@@ -49,52 +48,58 @@ function MarkdownEditor() {
     return { __html: marked(`# ${previewTitle}\n${markdownContent}`) };
   };
 
+  const toggleMarkdownSyntax = (text, syntax) => {
+    const syntaxPairs = {
+      heading1: /^# (.*)$/,
+      heading2: /^## (.*)$/,
+      heading3: /^### (.*)$/,
+      bold: /^\*\*(.*)\*\*$/,
+      italic: /^\*(.*)\*$/,
+      strikethrough: /^~~(.*)~~$/,
+      blockquote: /^> (.*)$/,
+      link: /^\[(.*)\]\(.*\)$/,
+      image: /^!\[(.*)\]\(.*\)$/,
+      code: /^```([\s\S]*?)```$/,
+    };
+    const syntaxWraps = {
+      heading1: '# ',
+      heading2: '## ',
+      heading3: '### ',
+      bold: '**',
+      italic: '*',
+      strikethrough: '~~',
+      blockquote: '> ',
+      link: ['[', '](url)'],
+      image: ['![', '](image-url)'],
+      code: ['```\n', '\n```'],
+    };
+
+    const regex = syntaxPairs[syntax];
+    if (regex && regex.test(text)) {
+      return text.replace(regex, '$1');
+    }
+
+    const wrap = syntaxWraps[syntax];
+    if (Array.isArray(wrap)) {
+      return `${wrap[0]}${text}${wrap[1]}`;
+    }
+    return `${wrap}${text}${wrap}`;
+  };
+
   const applyMarkdownSyntax = (syntax) => {
     if (!editorView) return;
-  
+
     editorView.dispatch(
       editorView.state.changeByRange((range) => {
         const selectedText = editorView.state.sliceDoc(range.from, range.to);
-        let newText = '';
-  
-        switch (syntax) {
-          case 'heading1':
-            newText = `# ${selectedText}`;
-            break;
-          case 'heading2':
-            newText = `## ${selectedText}`;
-            break;
-          case 'heading3':
-            newText = `### ${selectedText}`;
-            break;
-          case 'bold':
-            newText = `**${selectedText}**`;
-            break;
-          case 'italic':
-            newText = `*${selectedText}*`;
-            break;
-          case 'strikethrough':
-            newText = `~~${selectedText}~~`;
-            break;
-          case 'blockquote':
-            newText = `> ${selectedText}`;
-            break;
-          case 'link':
-            newText = `[${selectedText}](url)`;
-            break;
-          case 'image':
-            newText = `![${selectedText}](image-url)`;
-            break;
-          case 'code':
-            newText = `\`\`\`\n${selectedText}\n\`\`\``;
-            break;
-          default:
-            newText = selectedText;
-        }
-  
+        const newText = toggleMarkdownSyntax(selectedText, syntax);
+        
+        // 설정한 텍스트 길이에 맞추어 선택 영역을 유지합니다.
+        const newSelection = EditorSelection.range(range.from, range.from + newText.length);
+
         return {
           changes: { from: range.from, to: range.to, insert: newText },
-          range: EditorSelection.cursor(range.from + newText.length),
+          range: newSelection,
         };
       })
     );
