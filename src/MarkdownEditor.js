@@ -4,7 +4,7 @@ import { EditorView, keymap, placeholder } from '@codemirror/view';
 import { markdown } from '@codemirror/lang-markdown';
 import { defaultKeymap } from '@codemirror/commands';
 import { marked } from 'marked';
-import * as Styled from './MarkdownEditor.styles';
+import * as Styled from './Styled/MarkdownEditor.styles';
 
 function MarkdownEditor() {
   const editorRef = useRef(null);
