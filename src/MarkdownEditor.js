@@ -143,20 +143,23 @@ function MarkdownEditor() {
 
   const handleLinkInsert = () => {
     if (!editorView) return;
-    
+  
     const linkText = "링크 텍스트";
     const markdownLink = `[${linkText}](${linkURL})`;
+    const linkTextStart = 1; // [ 뒤의 시작 인덱스
+    const linkTextEnd = linkTextStart + linkText.length;
+  
     editorView.dispatch(
       editorView.state.changeByRange((range) => ({
         changes: { from: range.from, to: range.to, insert: markdownLink },
-        range: EditorSelection.cursor(range.from + markdownLink.length),
+        range: EditorSelection.range(range.from + linkTextStart, range.from + linkTextEnd),
       }))
     );
-
+  
     setIsModalOpen(false);
     setLinkURL('');
   };
-
+  
   const handleImageUpload = (event) => {
     const file = event.target.files[0];
     if (!file) return;
