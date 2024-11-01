@@ -122,13 +122,15 @@ function MarkdownEditor() {
             changes: { from: line.from, to: line.to, insert: newText },
             range: EditorSelection.cursor(line.from + newText.length),
           };
-        } else if (syntax === 'blockquote' || syntax === 'code') {
-          newText = toggleBlockStyle(selectedText || currentLineText, syntax);
-          const from = selectedText ? range.from : line.from;
-          const to = selectedText ? range.to : line.to;
+        } else if (syntax === 'blockquote') {
+          // 현재 라인의 가장 앞에 '>' 추가
+          newText = currentLineText.startsWith('> ')
+            ? currentLineText.slice(2) // 이미 '>'가 있다면 제거
+            : `> ${currentLineText}`; // '>'가 없다면 추가
+  
           return {
-            changes: { from, to, insert: newText },
-            range: EditorSelection.cursor(from + newText.length),
+            changes: { from: line.from, to: line.to, insert: newText },
+            range: EditorSelection.cursor(line.from + newText.length),
           };
         } else {
           newText = toggleInlineStyle(selectedText, syntax);
@@ -159,7 +161,7 @@ function MarkdownEditor() {
     setIsModalOpen(false);
     setLinkURL('');
   };
-  
+
   const handleImageUpload = (event) => {
     const file = event.target.files[0];
     if (!file) return;
